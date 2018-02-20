@@ -1,0 +1,24 @@
+{
+  "name": "what-the-clock",
+  "version": "0.0.1",
+  "main": "src/index.js",
+  "author": "Alex Barry",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "hyperapp": "^1.1.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.39",
+    "@babel/plugin-transform-react-jsx": "^7.0.0-beta.39",
+    "@babel/preset-env": "^7.0.0-beta.40",
+    "@babel/preset-stage-1": "^7.0.0-beta.40",
+    "ava": "^0.25.0",
+    "babel-loader": "^8.0.0-beta.0",
+    "webpack": "^3.10.0",
+    "webpack-dev-server": "^2.9.4"
+  },
+  "scripts": {
+    "start": "NODE_ENV=development webpack-dev-server --config ./webpack.config.js"
+  }
+}
