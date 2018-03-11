@@ -1,5 +1,6 @@
 import { h } from 'hyperapp';
 import { Link } from '@hyperapp/router';
+import trackUrl from '../assets/looperman-l-0907603-0087468-bluecollar-drumstepping.wav';
 
 import Clock from '../components/clock';
 import Modal from '../components/modal';
@@ -177,13 +178,20 @@ const EndGameModal = ({ score, name, onNameInput, submitScore, transitioning }) 
   </Modal>
 );
 
-export const Root = ({ state, actions, go }) => {
+export const Root = ({ state, actions, go, loadTrack, startTrack, stopTrack }) => {
   const score = calculateScoreFromHistory(state.history);
 
   return (
     <div
-      oncreate={() => actions.setup(go)}
-      ondestroy={actions.cleanup}
+      oncreate={() => {
+        loadTrack(trackUrl)
+          .then(() => startTrack(trackUrl));
+        actions.setup(go)
+      }}
+      ondestroy={() => {
+        stopTrack(trackUrl);
+        actions.cleanup();
+      }}
     >
       <Link to="/">I give up</Link>
       <h2>{timeLeft(state.accumulator)}</h2>

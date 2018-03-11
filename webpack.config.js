@@ -20,6 +20,12 @@ module.exports = {
         include: /src/,
         loader: 'babel-loader',
       },
+      {
+        test: /\.wav$/,
+        exclude: /node_modules/,
+        include: /src/,
+        loader: 'file-loader',
+      },
     ],
   },
 
