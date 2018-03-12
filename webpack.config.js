@@ -26,6 +26,11 @@ module.exports = {
         include: /src/,
         loader: 'file-loader',
       },
+      {
+        test: /\.styl$/,
+        exclude: /node_modules/,
+        loaders: ['style-loader', 'css-loader', 'stylus-loader'],
+      },
     ],
   },
 

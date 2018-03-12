@@ -1,0 +1,32 @@
+.home-menu
+  margin 100px auto
+  list-style none
+  padding 0
+  text-align center
+  width 300px
+
+  &__item
+    background-color white
+    border 1px black solid
+    display block
+    margin 5px 0
+    transition background-color 0.3s ease-in-out, color 0.3s ease-in-out
+    will-change background-color
+
+    &--active
+      background-color #333
+
+      .home-menu__item-link
+        color red
+
+    &-link
+      color black
+      display block
+      padding 10px 0
+      will-change color
+
+      &:focus
+        outline none
+
+
+

@@ -6,7 +6,23 @@ import * as Play from './views/play';
 import * as Scores from './views/scores';
 import * as Credits from './views/credits';
 
-const newAudioContext = (params) => new (window.AudioContext || window.webkitAudioContext)(params);
+const storageKey = 'what-the-clock';
+
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+const newAudioContext = settings => params => {
+  const instance = new AudioContextClass(params)
+
+  if (settings.audioPlaying === false) {
+    instance.suspend();
+  }
+
+  return instance;
+}
+
+const settingsData = localStorage.getItem(storageKey);
+const settings = settingsData
+  ? JSON.parse(settingsData)
+  : { audioPlaying: true };
 
 const initialState = {
   home: Home.initialState,
@@ -14,9 +30,10 @@ const initialState = {
   scores: Scores.initialState,
   credits: Credits.initialState,
   location: location.state,
-  audio: newAudioContext({
+  audio: newAudioContext(settings)({
     latencyHint: 'balanced',
   }),
+  audioPlaying: settings.audioPlaying,
   tracks: {},
 };
 
@@ -32,8 +49,8 @@ const loadTrackFromUrl = audio => url => {
     })
     .then(buffer => {
       source.buffer = buffer;
-      source.connect(audio.destination);
       source.loop = true;
+      source.start(0);
 
       return {
         source,
@@ -55,7 +72,6 @@ const actions = {
 
     return loadTrackFromUrl(state.audio)(url)
       .then(track => {
-        track.source.start(0);
         actions.addTrack({ url, track });
         return track;
       });
@@ -81,17 +97,39 @@ const actions = {
   updateTrack: ({ url, isPlaying }) => state => ({
     tracks: { ...state.tracks, [url]: { ...state.tracks[url], isPlaying } },
   }),
+
+  suspendAudio: () => (state, actions) => {
+    if (!state.audioPlaying) return;
+
+    state.audio.suspend()
+      .then(() => actions.setAudioPlaying(false));
+  },
+
+  resumeAudio: () => (state, actions) => {
+    if (state.audioPlaying) return;
+
+    state.audio.resume()
+      .then(() => actions.setAudioPlaying(true));
+  },
+
+  setAudioPlaying: audioPlaying => {
+    localStorage.setItem(storageKey, JSON.stringify({ audioPlaying }));
+    return { audioPlaying };
+  },
 };
 
 const view = (state, actions) => (
   <div>
-    <h1>What the clock?!?</h1>
+    <div>
+      <h1>What the clock?!?</h1>
+    </div>
     <Route
       path="/"
       render={() =>
         <Home.Root
           state={state.home}
           actions={actions.home}
+          go={actions.location.go}
           loadTrack={actions.loadTrack}
           startTrack={actions.startTrack}
           stopTrack={actions.stopTrack}
@@ -136,6 +174,26 @@ const view = (state, actions) => (
         />
       }
     />
+    <div>
+      {state.audioPlaying
+        ? (
+          <button
+            type="button"
+            onclick={() => actions.suspendAudio()}
+          >
+            Pause Audio
+          </button>
+        )
+        : (
+          <button
+            type="button"
+            onclick={() => actions.resumeAudio()}
+          >
+            Play Audio
+          </button>
+        )
+      }
+    </div>
   </div>
 );
 
